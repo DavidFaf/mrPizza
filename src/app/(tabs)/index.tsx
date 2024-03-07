@@ -1,37 +1,14 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import {View } from "react-native";
 
-// import EditScreenInfo from "@/components/EditScreenInfo";
-import Colors from "@/constants/Colors";
 import products from "assets/data/products";
 
-const product = products[0]
+import ProductListItem from "@/components/ProductListItem";
 
-export default function TabOneScreen() {
+export default function MenuScreen() {
   return (
-    <View style={styles.container}>
-      <Image source={{uri: product.image}} style={styles.image}/>
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>{product.price}</Text>
-    </View>
+   <View>
+    <ProductListItem product={products[1]}/>
+    <ProductListItem product={products[0]}/>
+   </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container:{
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 20
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  price : {
-    color: Colors.light.tint,
-    fontWeight: 'bold'
-  },
-  image :{
-    aspectRatio: 1,
-    width: '100%'
-  }
-});
