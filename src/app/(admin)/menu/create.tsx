@@ -1,9 +1,15 @@
+import {
+  useDeleteProduct,
+  useInsertProduct,
+  useProduct,
+  useUpdateProduct,
+} from "@/api/products";
 import Button from "@/components/Button";
 import { defaultPizzaImage } from "@/components/ProductListItem";
 import Colors from "@/constants/Colors";
 import * as ImagePicker from "expo-image-picker";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
 
 const CreateProductScreen = () => {
@@ -12,8 +18,24 @@ const CreateProductScreen = () => {
   const [errors, setErrors] = useState("");
   const [image, setImage] = useState<String | null>(null);
 
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id = parseFloat(
+    typeof idString === "string" ? idString : idString?.[0]
+  );
   const isUpdating = !!id;
+
+  const { mutate: insertProduct } = useInsertProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
+  const { data: updatingProduct } = useProduct(id);
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  useEffect(() => {
+    if (updatingProduct) {
+      setName(updatingProduct.name);
+      setPrice(updatingProduct.price.toString());
+      setImage(updatingProduct.image);
+    }
+  }, [updatingProduct]);
 
   const resetFields = () => {
     setName("");
@@ -42,45 +64,66 @@ const CreateProductScreen = () => {
       return;
     }
 
-    console.warn("Creating Product");
-
-    resetFields();
+    insertProduct(
+      { name, price: parseFloat(price), image },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      }
+    );
   };
 
   const onUpdateCreate = () => {
     if (!validateInput()) {
       return;
     }
-
-    console.warn("Updating Product");
-
-    resetFields();
+    updateProduct(
+      {
+        id,
+        name,
+        price: parseFloat(price),
+        image,
+      },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      }
+    );
   };
 
   const onSubmit = () => {
-    if(isUpdating){
-      onUpdateCreate()
+    if (isUpdating) {
+      onUpdateCreate();
     } else {
-      onCreate()
+      onCreate();
     }
-  }
+  };
 
   const onDelete = () => {
-    console.warn("DELETE !!!!")
-  }
+    deleteProduct(id, {
+      onSuccess: () => {
+        resetFields();
+        router.replace("/(admin)");
+      },
+    });
+  };
 
   const confirmDelete = () => {
-    Alert.alert("Confirm" , "Are you sure you want to delete this product", [
+    Alert.alert("Confirm", "Are you sure you want to delete this product", [
       {
-        text: "Cancel"
+        text: "Cancel",
       },
       {
         text: "Delete",
         style: "destructive",
-        onPress: onDelete
-      }
-    ])
-  }
+        onPress: onDelete,
+      },
+    ]);
+  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -127,7 +170,11 @@ const CreateProductScreen = () => {
 
       <Text style={{ color: "red" }}>{errors}</Text>
       <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
-      {isUpdating && <Text onPress={confirmDelete} style={styles.textButton}>Delete</Text>}
+      {isUpdating && (
+        <Text onPress={confirmDelete} style={styles.textButton}>
+          Delete
+        </Text>
+      )}
     </View>
   );
 };
