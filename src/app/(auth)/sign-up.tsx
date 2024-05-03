@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TextInput, Alert } from "react-native";
 import Button from "@/components/Button";
 import { useState } from "react";
 import Colors from "@/constants/Colors";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 
 const signUp = () => {
@@ -16,6 +16,7 @@ const signUp = () => {
 
     if (error) Alert.alert(error.message);
     // await new Promise(resolve => setTimeout(resolve, 600));
+    router.push("/")
 
     setLoading(false);
   }
