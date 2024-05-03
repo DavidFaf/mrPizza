@@ -11,6 +11,10 @@ import * as ImagePicker from "expo-image-picker";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
+import * as FileSystem from "expo-file-system";
+import { supabase } from "@/lib/supabase";
+import { randomUUID } from "expo-crypto";
+import { decode } from "base64-arraybuffer";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState("");
@@ -59,13 +63,15 @@ const CreateProductScreen = () => {
     return true;
   };
 
-  const onCreate = () => {
+  const onCreate = async () => {
     if (!validateInput()) {
       return;
     }
 
+    const imagePath = await uploadImage();
+
     insertProduct(
-      { name, price: parseFloat(price), image },
+      { name, price: parseFloat(price), image: imagePath },
       {
         onSuccess: () => {
           resetFields();
@@ -75,16 +81,19 @@ const CreateProductScreen = () => {
     );
   };
 
-  const onUpdateCreate = () => {
+  const onUpdateCreate = async () => {
     if (!validateInput()) {
       return;
     }
+
+    const imagePath = await uploadImage();
+
     updateProduct(
       {
         id,
         name,
         price: parseFloat(price),
-        image,
+        image: imagePath,
       },
       {
         onSuccess: () => {
@@ -141,12 +150,34 @@ const CreateProductScreen = () => {
     }
   };
 
+  const uploadImage = async () => {
+    if (!image?.startsWith("file://")) {
+      return;
+    }
+
+    const base64 = await FileSystem.readAsStringAsync(image, {
+      encoding: "base64",
+    });
+    const filePath = `${randomUUID()}.png`;
+    const contentType = "image/png";
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .upload(filePath, decode(base64), { contentType });
+
+    if (data) {
+      return data.path;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
         options={{ title: isUpdating ? "Update Pizza" : "Create pizza" }}
       />
-      <Image source={{ uri: defaultPizzaImage }} style={styles.image} />
+      <Image
+        source={{ uri: image || defaultPizzaImage }}
+        style={styles.image}
+      />
       <Text onPress={pickImage} style={styles.textButton}>
         Select Image
       </Text>

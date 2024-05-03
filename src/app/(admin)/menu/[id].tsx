@@ -1,4 +1,11 @@
-import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import React from "react";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import products from "@assets/data/products";
@@ -10,6 +17,7 @@ import { PizzaSize } from "@/types";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import { useProduct } from "@/api/products";
+import RemoteImage from "@/components/RemoteImage";
 
 const ProductDetailScreen = () => {
   const { id: idString } = useLocalSearchParams();
@@ -67,8 +75,9 @@ const ProductDetailScreen = () => {
 
       <Stack.Screen options={{ title: product?.name }} />
 
-      <Image
-        source={{ uri: product?.image || defaultPizzaImage }}
+      <RemoteImage
+        path={product?.image}
+        fallback={defaultPizzaImage}
         style={styles.image}
       />
 

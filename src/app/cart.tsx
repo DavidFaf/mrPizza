@@ -7,7 +7,7 @@ import CartListItem from "@/components/CartListItem";
 import Button from "@/components/Button";
 
 const CartPage = () => {
-  const { items, total } = useCart();
+  const { items, total, checkout } = useCart();
 
   return (
     <View style={{ padding: 10 }}>
@@ -21,7 +21,7 @@ const CartPage = () => {
         Total : ${total}
       </Text>
 
-      <Button text="Checkout" />
+      <Button onPress={checkout} text="Checkout" />
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );

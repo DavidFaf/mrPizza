@@ -8,8 +8,6 @@ import { supabase } from "@/lib/supabase";
 const index = () => {
   const { session, loading, profile, isAdmin } = useAuth();
 
-  console.log(profile);
-
   if (loading) {
     return <ActivityIndicator />;
   }
@@ -30,7 +28,6 @@ const index = () => {
       <Link href={"/sign-in"} asChild>
         <Button text="Sign in" />
       </Link>
-      <Button onPress={() => supabase.auth.signOut()} text="Sign out" />
     </View>
   );
 };
