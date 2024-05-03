@@ -10,7 +10,7 @@ import { stripe } from "./_utils/stripe.ts";
 
 Deno.serve(async (req) => {
   try {
-    const { amount } = await req.json();
+    const { amount } = await req.json(); 
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
