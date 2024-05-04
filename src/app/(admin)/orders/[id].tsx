@@ -14,6 +14,7 @@ import { OrderStatusList } from "@/types";
 import Colors from "@/constants/Colors";
 import { useOrderDetails } from "@/api/orders";
 import { useUpdateOrder } from "@/api/order-items";
+import { notifyUserAboutOrderUpdate } from "@/lib/notifications";
 
 const OrderDetailsScreen = () => {
   const { id: idString } = useLocalSearchParams();
@@ -29,8 +30,12 @@ const OrderDetailsScreen = () => {
     return <Text>Failed to retrieve product</Text>;
   }
 
-  const updateStatus = (status: string) => {
+  const updateStatus = async (status: string) => {
     updateOrder({ id: id, updatedField: { status: status } });
+    console.log("Notify", order?.user_id);
+    if(order){
+    await notifyUserAboutOrderUpdate(order)
+    }
   };
 
   return (
