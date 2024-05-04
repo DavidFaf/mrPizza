@@ -54,7 +54,7 @@ export async function registerForPushNotificationsAsync() {
   }
 }
 
-export async function sendPushNotification(expoPushToken: string) {
+export  async function sendPushNotification(expoPushToken: string) {
   const message = {
     to: expoPushToken,
     sound: "default",

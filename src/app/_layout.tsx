@@ -84,7 +84,7 @@ function RootLayoutNav() {
                   <Stack.Screen
                     name="cart"
                     options={{ presentation: "modal" }}
-                  />
+                  /> 
                 </Stack>
               </CartProvider>
             </NotificationProvider> 
